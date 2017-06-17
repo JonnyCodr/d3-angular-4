@@ -1,0 +1,32 @@
+.chart-wrapper {
+  background-color: #ddd;
+}
+
+.tac {
+  text-align: center;
+}
+
+.chart-wrapper h2.chart-title {
+  padding-top: 10px;
+  color: #446CB3;
+}
+
+:host /deep/ .chart-wrapper .bar {
+  display: inline-block;
+  width: 30px;
+  height: 75px;
+  transition: all 1s ease-out;
+  -moz-transition: all 1s ease-out;
+  -webkit-transition: all 1s ease-out;
+  margin-right: 10px;
+  background-color: teal;
+  box-shadow: 2px 2px 2px #666;
+}
+
+:host /deep/ .chart-wrapper:hover .bar {
+  background-color: #446CB3;
+}
+
+:host /deep/ .chart-wrapper .bar:hover {
+  background-color: #000;
+}
