@@ -1,6 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
+import { OurCommonModule } from './common/common.module'
 import {
   NgModule,
   ApplicationRef
@@ -60,6 +61,7 @@ type StoreType = {
    * Import Angular's modules.
    */
   imports: [
+    OurCommonModule,
     BrowserModule,
     FormsModule,
     HttpModule,
