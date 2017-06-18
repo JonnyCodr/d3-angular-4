@@ -1,6 +1,7 @@
 /* this file will be extracted to main dist folder and is imported in index.html */
 /* This file is for setting global styles  */
 @import 'variables';
+@import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 
 nav {
   margin-top: 16px;
@@ -16,4 +17,12 @@ nav a {
   text-align: center;
   text-decoration: none;
   border-radius: 4px;
+}
+
+.d3-tip {
+  background-color: #2c3e50;
+}
+
+.d3-tip:after {
+  color: #2c3e50;
 }

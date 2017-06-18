@@ -5,7 +5,8 @@ import {
     ElementRef,
     Renderer
 } from '@angular/core';
-import * as d3 from 'd3'
+import * as d3 from 'd3';
+import d3Tip from 'd3-tip';
 
 @Component({
     selector: 'chart',
@@ -26,7 +27,7 @@ export class ChartComponent implements OnChanges {
         width: 500,
         height: 300
     }
-    @Input() margin = {
+    margin = {
         top: 40,
         right: 20,
         bottom: 30,
@@ -39,12 +40,13 @@ export class ChartComponent implements OnChanges {
     }
 
     render(newValue) {
+        const tip = d3Tip().attr('class', 'd3-tip').html((d) => d.val);
         const width = this.dimension.width - this.margin.left - this.margin.right;
         const height = this.dimension.height - this.margin.top - this.margin.bottom;
         const val = newValue.map(res => res.val)
         this.previousData = this.data;
 
-        const formatPercent = d3.format(".00000%");
+        const format = d3.format(["$", ""]);
 
         const xScale = d3.scaleBand()
             .domain(newValue.map(res => res.name))
@@ -59,6 +61,7 @@ export class ChartComponent implements OnChanges {
 
         const yAxis = d3.axisLeft()
             .scale(yScale)
+            .tickFormat(format)
 
         const colors = d3.scaleLinear()
             .domain([0, newValue.length, newValue.length, newValue.length])
@@ -69,6 +72,21 @@ export class ChartComponent implements OnChanges {
         }
 
         const tooltip = d3.select("body").append("div").attr("class", "toolTip");
+
+        const handleMouseOver = (d, i, e) => {
+            const bound = e[i].getBoundingClientRect();
+            tooltip
+                .style("left", bound.left + "px")
+                .style("top", bound.top + "px")
+                .style("display", "inline-block")
+                .style('position', 'absolute')
+                .style('background-color', '#000')
+                .style('width', bound.width + 'px')
+                .style('color', '#fff')
+                .style('text-align', 'center')
+                .style('opacity', '0.5')
+                .html(d.name + '<br>' + d.val);
+        }
 
         if (this.elementRef !== null) {
             const d3ParentElement = d3.select(this.elementRef);
@@ -81,7 +99,24 @@ export class ChartComponent implements OnChanges {
             svg.append("g")
                 .attr("class", "x axis")
                 .attr("transform", "translate(0," + height + ")")
-                .call(xAxis);
+                .call(xAxis)
+                .append("text")
+                .attr("y", 30)
+                .attr("x", width / 2)
+                .style("text-anchor", "end")
+                .text("Month");
+
+
+            const title = svg.append("g")
+                .append("text")
+                .attr('class', 'title')
+                .attr("y", -10)
+                .style("text-anchor", "end")
+                .text(this.title);
+
+            const titleElem = this.elementRef.querySelector('.title');
+            const titleWidth = titleElem.getBoundingClientRect().width;
+            title.attr("x", width / 2 + (titleWidth/2));
 
             svg.append("g")
                 .attr("class", "y axis")
@@ -91,7 +126,9 @@ export class ChartComponent implements OnChanges {
                 .attr("y", 6)
                 .attr("dy", ".71em")
                 .style("text-anchor", "end")
-                .text("Frequency");
+                .text("Value");
+
+            svg.call(tip);
 
             const bar = svg.selectAll('rect')
                 .data(newValue)
@@ -100,10 +137,15 @@ export class ChartComponent implements OnChanges {
             const react = bar.append('rect')
                 .attr('style', (d, i) => color(d.val, i))
                 .attr('width', xScale.bandwidth())
-                .attr('x',(d) => xScale(d.name))
+                .attr('x', (d) => xScale(d.name))
                 .attr('height', 0)
                 .attr('y', height)
+                .on("mouseover", handleMouseOver)
+                .on("mouseout", (d) => { tooltip.style("display", "none"); })
                 .attr('class', 'bar')
+                .on('mouseover', tip.show)
+                .on('mouseout', tip.hide)
+
 
             const reactTransition = react.transition()
                 .attr('height', (d, i, e) => {
@@ -116,7 +158,6 @@ export class ChartComponent implements OnChanges {
 
         }
     }
-
 
     removeAllElement() {
         const nodes = this.elementRef.querySelectorAll('svg');
