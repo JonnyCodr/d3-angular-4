@@ -3,7 +3,8 @@ import {
     OnInit,
     OnChanges,
     Input,
-    ElementRef
+    ElementRef,
+    Renderer
 } from '@angular/core';
 import * as d3 from 'd3'
 
@@ -11,40 +12,83 @@ import * as d3 from 'd3'
     selector: 'chart',
     template: `
         <div class="chart-wrapper tac" [style.width.px]="dimension.width" [style.height.px]="dimension.height">
-            <h2 class="chart-title">{{ title }}</h2>
+            <svg>
+            </svg>
         </div>
     `,
     styleUrls: ['chart.component.css']
 })
 
 export class ChartComponent implements OnInit, OnChanges {
-    elementRef: ElementRef;
+    private elementRef: any;
+
+    previousData: any = [];
     @Input() data: Array<number> = [1, 2, 3, 4];
     @Input() title: any = 'This is Title';
     @Input() dimension: any = {
         width: 500,
         height: 300
     }
+    @Input() remove: any = null;
 
     constructor(elementRef: ElementRef) {
         this.elementRef = elementRef.nativeElement;
     }
 
     render(newValue) {
-        d3.select(this.elementRef).select('.chart-wrapper').selectAll('div')
-            .data(newValue)
-            .enter()
-            .append('div')
-            .attr('class', 'bar')
-            .style('height', d => d + '%')
+        this.previousData = this.data;
+
+        var xScale = d3.scaleBand()
+            .domain(d3.range(0, newValue.length))
+            .range([0, this.dimension.width])
+
+        const yScale = d3.scaleLinear()
+            .domain([0, d3.max(newValue)])
+            .range([0, this.dimension.height]);
+
+        const colors = d3.scaleLinear()
+            .domain([0, newValue.length, newValue.length, newValue.length])
+            .range(['#16a085', 'teal'])
+
+        const color = (data, i) => {
+            return 'fill:' + colors(i)
+        }
+
+        if (this.elementRef !== null) {
+            let d3ParentElement = d3.select(this.elementRef);
+            d3ParentElement.select('.chart-wrapper').select('svg')
+                .attr('width', this.dimension.width)
+                .attr('height', this.dimension.height)
+                .selectAll('rect')
+                .data(newValue)
+                .enter()
+                .append('rect')
+                .attr('style', (d, i) => color(d,i))
+                .attr('x', (d, i) => xScale(i))
+                .attr('y', (d: any) => this.dimension.height - yScale(d))
+                .attr('width', xScale.bandwidth() - 1)
+                .attr('height', (d) => {
+                    return yScale(d)
+                })
+                .attr('class', 'bar')
+        }
     }
 
     ngOnInit() {
-        console.log('D3 wrapper initialized');
         this.render(this.data);
     }
 
+    removeAllElement() {
+        const nodes = this.elementRef.querySelectorAll('.bar');
+        if (nodes) {
+            Array.prototype.slice.call(nodes).map(res => {
+                res.parentNode.removeChild(res);
+            })
+        }
+    }
+
     ngOnChanges() {
+        this.removeAllElement();
         this.render(this.data)
     }
 }

@@ -13,13 +13,11 @@
 
 :host /deep/ .chart-wrapper .bar {
   display: inline-block;
-  width: 30px;
-  height: 75px;
   transition: all 1s ease-out;
   -moz-transition: all 1s ease-out;
   -webkit-transition: all 1s ease-out;
   margin-right: 10px;
-  background-color: teal;
+  fill: teal;
   box-shadow: 2px 2px 2px #666;
 }
 
