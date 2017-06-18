@@ -61,6 +61,12 @@ export class HomeComponent implements OnInit {
   };
   chart: any = [{ name: 'January', val: 10 }, { name: 'February', val: 20 }, { name: 'March', val: 100 }];
   error: any = null;
+  width = 500;
+  height = 250;
+  dimension: any = {
+    width: this.width,
+    height: this.height
+  }
 
   onAdd() {
     if (this.data.val > 0) {
@@ -92,5 +98,12 @@ export class HomeComponent implements OnInit {
     this.chart = new Array();
     this.data = null;
     this.error = null;
+  }
+
+  changeSize() {
+    this.dimension = Object.assign({}, {
+      width: parseInt(this.width),
+      height: parseInt(this.height)
+    });
   }
 }

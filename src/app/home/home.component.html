@@ -1,14 +1,57 @@
-<chart 
-[title]="'Chart'" 
-[dimension]="{ width: 500, height: 300 }" 
-[data]="chart">
-</chart>
-<input name="name" [(ngModel)]="data.name" (keyup)="onKeyUp($event)" placeholder="month">
-<input name="val" [(ngModel)]="data.val" (keyup)="onKeyUp($event)" placeholder="value">
-<button (click)="onAdd()">add</button><button (click)="reset()">Reset</button>
-<small [style.color]="'red'">{{error}}</small>
-<ul>
-    <li *ngFor="let list of chart">
-        {{ list.name }} = {{ list.val }} 
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-6">
+      <chart [title]="'Finance Report'" [dimension]="dimension" [data]="chart">
+      </chart>
+
+    </div>
+    <div class="col-md-6">
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="form-group">
+            <label for="">
+              Add new item
+            </label>
+            <br>
+            <input name="name" [(ngModel)]="data.name" (keyup)="onKeyUp($event)" placeholder="month">
+            <input name="val" [(ngModel)]="data.val" (keyup)="onKeyUp($event)" placeholder="value">
+            <button (click)="onAdd()">add</button><button (click)="reset()">Reset</button>
+            <small [style.color]="'red'">{{error}}</small>
+          </div>
+
+          <div class="form-group">
+            <label for="">
+              Change Size
+            </label>
+            <br>
+            <input name="name" [(ngModel)]="width" placeholder="month">
+            <input name="val" [(ngModel)]="height" placeholder="value">
+            <button (click)="changeSize()">Apply</button>
+          </div>
+
+        </div>
+        <div class="col-sm-6">
+          <ul>
+            <h2>History</h2>
+            <li *ngFor="let list of chart">
+              {{ list.name }} = {{ list.val }}
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <ul>
+    <h2>Ability</h2>
+    <li>You can add new data by entering month name and value
+      <ul>
+        <li>Month is not mandatory</li>
+        <li>Value is mandatory</li>
+        <li>Value just allow number input start from 1</li>
+      </ul>
     </li>
-</ul>
+    <li>Dynamic bar width</li>
+    <li>Dynamic bar height</li>
+    <li>Transition animation</li>
+  </ul>
+</div>
