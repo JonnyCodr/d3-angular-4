@@ -39,7 +39,7 @@ export class ChartComponent implements OnChanges {
         this.elementRef = elementRef.nativeElement;
     }
 
-    render(newValue) {
+    initialDeclarations(newValue) {
         const tip = d3Tip().attr('class', 'd3-tip').html((d) => d.val);
         const width = this.dimension.width - this.margin.left - this.margin.right;
         const height = this.dimension.height - this.margin.top - this.margin.bottom;
@@ -73,89 +73,91 @@ export class ChartComponent implements OnChanges {
 
         const tooltip = d3.select("body").append("div").attr("class", "toolTip");
 
-        const handleMouseOver = (d, i, e) => {
-            const bound = e[i].getBoundingClientRect();
-            tooltip
-                .style("left", bound.left + "px")
-                .style("top", bound.top + "px")
-                .style("display", "inline-block")
-                .style('position', 'absolute')
-                .style('background-color', '#000')
-                .style('width', bound.width + 'px')
-                .style('color', '#fff')
-                .style('text-align', 'center')
-                .style('opacity', '0.5')
-                .html(d.name + '<br>' + d.val);
-        }
+        return Object.assign({}, {
+            tip, width, height, xScale, yScale, xAxis, yAxis, color, tooltip
+        })
+    }
 
+    createSvg(chart) {
+        const d3ParentElement = d3.select(this.elementRef);
+        return d3ParentElement.select('.chart-wrapper').append("svg")
+            .attr("width", chart.width + this.margin.left + this.margin.right)
+            .attr("height", chart.height + this.margin.top + this.margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
+    }
+
+    createXAxis(chart, svg) {
+        svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + chart.height + ")")
+            .call(chart.xAxis)
+            .append("text")
+            .attr("y", 30)
+            .attr("x", chart.width / 2)
+            .style("text-anchor", "end")
+            .text("Month");
+    }
+
+    createTitle(chart, svg) {
+        const title = svg.append("g")
+            .append("text")
+            .attr('class', 'title')
+            .attr("y", -10)
+            .style("text-anchor", "end")
+            .text(this.title);
+
+        const titleElem = this.elementRef.querySelector('.title');
+        const titleWidth = titleElem.getBoundingClientRect().width;
+        title.attr("x", chart.width / 2 + (titleWidth / 2));
+    }
+
+    createYAxis(chart, svg) {
+        svg.append("g")
+            .attr("class", "y axis")
+            .call(chart.yAxis)
+            .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 6)
+            .attr("dy", ".71em")
+            .style("text-anchor", "end")
+            .text("Value");
+    }
+
+    createBar(chart, svg, data) {
+        const bar = svg.selectAll('rect')
+            .data(data)
+            .enter()
+
+        const rect = bar.append('rect')
+            .attr('style', (d, i) => chart.color(d.val, i))
+            .attr('width', chart.xScale.bandwidth())
+            .attr('x', (d) => chart.xScale(d.name))
+            .attr('height', 0)
+            .attr('y', chart.height)
+            .attr('class', 'bar')
+            .on('mouseover', chart.tip.show)
+            .on('mouseout', chart.tip.hide)
+
+        rect.transition()
+            .attr('height', (d, i, e) => {
+                return chart.height - chart.yScale(d.val)
+            })
+            .attr('y', (d: any) => chart.yScale(d.val))
+            .delay((data, i) => i * 20)
+            .duration(500)
+            .ease(d3.easeElastic)
+    }
+
+    render(newValue) {
+        const chart = this.initialDeclarations(newValue);
+        const svg = this.createSvg(chart);
         if (this.elementRef !== null) {
-            const d3ParentElement = d3.select(this.elementRef);
-            const svg = d3ParentElement.select('.chart-wrapper').append("svg")
-                .attr("width", width + this.margin.left + this.margin.right)
-                .attr("height", height + this.margin.top + this.margin.bottom)
-                .append("g")
-                .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
-
-            svg.append("g")
-                .attr("class", "x axis")
-                .attr("transform", "translate(0," + height + ")")
-                .call(xAxis)
-                .append("text")
-                .attr("y", 30)
-                .attr("x", width / 2)
-                .style("text-anchor", "end")
-                .text("Month");
-
-
-            const title = svg.append("g")
-                .append("text")
-                .attr('class', 'title')
-                .attr("y", -10)
-                .style("text-anchor", "end")
-                .text(this.title);
-
-            const titleElem = this.elementRef.querySelector('.title');
-            const titleWidth = titleElem.getBoundingClientRect().width;
-            title.attr("x", width / 2 + (titleWidth/2));
-
-            svg.append("g")
-                .attr("class", "y axis")
-                .call(yAxis)
-                .append("text")
-                .attr("transform", "rotate(-90)")
-                .attr("y", 6)
-                .attr("dy", ".71em")
-                .style("text-anchor", "end")
-                .text("Value");
-
-            svg.call(tip);
-
-            const bar = svg.selectAll('rect')
-                .data(newValue)
-                .enter()
-
-            const react = bar.append('rect')
-                .attr('style', (d, i) => color(d.val, i))
-                .attr('width', xScale.bandwidth())
-                .attr('x', (d) => xScale(d.name))
-                .attr('height', 0)
-                .attr('y', height)
-                .on("mouseover", handleMouseOver)
-                .on("mouseout", (d) => { tooltip.style("display", "none"); })
-                .attr('class', 'bar')
-                .on('mouseover', tip.show)
-                .on('mouseout', tip.hide)
-
-
-            const reactTransition = react.transition()
-                .attr('height', (d, i, e) => {
-                    return height - yScale(d.val)
-                })
-                .attr('y', (d: any) => yScale(d.val))
-                .delay((data, i) => i * 20)
-                .duration(500)
-                .ease(d3.easeElastic)
-
+            this.createXAxis(chart, svg)
+            this.createTitle(chart, svg);
+            this.createYAxis(chart, svg);
+            svg.call(chart.tip);
+            this.createBar(chart, svg, newValue)
         }
     }
 
