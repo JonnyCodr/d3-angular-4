@@ -55,15 +55,24 @@ export class HomeComponent implements OnInit {
     this.localState.value = '';
   }
 
-  data: any;
-  chart: any = [10,20,30,40];
+  data: any = {
+    name: null,
+    val: null
+  };
+  chart: any = [{ name: 'January', val: 10 }, { name: 'February', val: 20 }, { name: 'March', val: 100 }];
   error: any = null;
 
   onAdd() {
-    if (this.data > 0) {
-      this.chart = this.chart.concat(parseInt(this.data))
+    if (this.data.val > 0) {
+      const data = Object.assign({}, this.data, {
+        val: parseInt(this.data.val)
+      })
+      this.chart = this.chart.concat(data)
       this.error = null;
-      this.data = null;
+      this.data = {
+        name: null,
+        val: null
+      };
     } else {
       this.error = 'Zero is not allowed';
     }

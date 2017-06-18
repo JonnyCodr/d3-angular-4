@@ -1,13 +1,14 @@
 <chart 
 [title]="'Chart'" 
-[dimension]="{ width: 600, height: 400 }" 
+[dimension]="{ width: 500, height: 300 }" 
 [data]="chart">
 </chart>
-<input name="add" [(ngModel)]="data" (keyup)="onKeyUp($event)">
+<input name="name" [(ngModel)]="data.name" (keyup)="onKeyUp($event)" placeholder="month">
+<input name="val" [(ngModel)]="data.val" (keyup)="onKeyUp($event)" placeholder="value">
 <button (click)="onAdd()">add</button><button (click)="reset()">Reset</button>
 <small [style.color]="'red'">{{error}}</small>
 <ul>
     <li *ngFor="let list of chart">
-        {{ list }} 
+        {{ list.name }} = {{ list.val }} 
     </li>
 </ul>
