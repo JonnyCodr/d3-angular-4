@@ -23,7 +23,7 @@ import { XLargeDirective } from './x-large';
   /**
    * Our list of styles in our component. We may add more to compose many styles together.
    */
-  styleUrls: [ './home.component.css' ],
+  styleUrls: ['./home.component.css'],
   /**
    * Every Angular template is first compiled by the browser before Angular runs it's compiler.
    */
@@ -40,7 +40,7 @@ export class HomeComponent implements OnInit {
   constructor(
     public appState: AppState,
     public title: Title
-  ) {}
+  ) { }
 
   public ngOnInit() {
     console.log('hello `Home` component');
@@ -53,5 +53,35 @@ export class HomeComponent implements OnInit {
     console.log('submitState', value);
     this.appState.set('value', value);
     this.localState.value = '';
+  }
+
+  data: any;
+  chart: any = [10,20,30,40];
+  error: any = null;
+
+  onAdd() {
+    if (this.data > 0) {
+      this.chart = this.chart.concat(parseInt(this.data))
+      this.error = null;
+      this.data = null;
+    } else {
+      this.error = 'Zero is not allowed';
+    }
+  }
+
+  onKeyUp(event) {
+    if (event.key == 'Enter') {
+      this.onAdd();
+    } else if (parseInt(event.key) == NaN) {
+      this.error = "Please just input number";
+    } else {
+      this.error = null;
+    }
+  }
+
+  reset() {
+    this.chart = new Array();
+    this.data = null;
+    this.error = null;
   }
 }
