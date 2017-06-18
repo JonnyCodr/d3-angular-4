@@ -61,8 +61,8 @@ export class HomeComponent implements OnInit {
   };
   chart: any = [{ name: 'January', val: 10 }, { name: 'February', val: 20 }, { name: 'March', val: 100 }];
   error: any = null;
-  width = 500;
-  height = 250;
+  width: any = 500;
+  height: any = 250;
   dimension: any = {
     width: this.width,
     height: this.height
