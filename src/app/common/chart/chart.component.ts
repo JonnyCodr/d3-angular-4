@@ -64,12 +64,18 @@ export class ChartComponent implements OnInit, OnChanges {
                 .enter()
                 .append('rect')
                 .attr('style', (d, i) => color(d,i))
-                .attr('x', (d, i) => xScale(i))
-                .attr('y', (d: any) => this.dimension.height - yScale(d))
-                .attr('width', xScale.bandwidth() - 1)
+                .attr('width', xScale.bandwidth())
+                .attr('x', (data, i) => xScale(i))
+                .attr('height', 0)
+                .attr('y', this.dimension.height)
+                .transition()
                 .attr('height', (d) => {
                     return yScale(d)
                 })
+                .attr('y', (d: any) => this.dimension.height - yScale(d))
+                .delay((data, i) => i * 20)
+                .duration(500)
+                .ease(d3.easeElastic)
                 .attr('class', 'bar')
         }
     }
