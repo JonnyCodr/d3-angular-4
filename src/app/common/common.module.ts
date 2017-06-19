@@ -4,7 +4,8 @@ import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
 import { ChartComponent } from './chart/chart.component';
-
+import { BarChartComponent } from './chart/bar.component';
+import { LineChartComponent } from './chart/line.component'
 console.log('`Common` bundle loaded asynchronously');
 
 @NgModule({
@@ -13,13 +14,17 @@ console.log('`Common` bundle loaded asynchronously');
      * Components / Directives/ Pipes
      */
     ChartComponent,
+    BarChartComponent,
+    LineChartComponent
   ],
   imports: [
     CommonModule,
     FormsModule
   ],
-    exports: [
-      ChartComponent
-    ]
+  exports: [
+    ChartComponent,
+    BarChartComponent,
+    LineChartComponent
+  ]
 })
-export class OurCommonModule {}
+export class OurCommonModule { }
